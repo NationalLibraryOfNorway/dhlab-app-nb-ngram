@@ -117,4 +117,12 @@
 - Improved layout responsiveness
   - Made input field expand with window width
   - Enhanced mobile layout with proper stacking
-  - Added flex handling for better control organization 
+  - Added flex handling for better control organization
+
+## 2025-08-22
+
+- Appen er nå kopiert fra bruker `yoonsen` til organisasjonen `NationalLibraryOfNorway`.
+- Alle referanser til `yoonsen` er fjernet fra kildekoden og dokumentasjonen.
+- GitHub Pages er satt opp for repoet og fungerer med riktig URL.
+- Grafen (Chart.js) viser nå kun relevante årstall på x-aksen, takket være bruk av siste år i dataene som øvre grense (`chartMaxYear`). Dette løser problemet med at x-aksen tidligere gikk til 2050 ved bruk av `maxTicksLimit`.
+- Lokal utviklingsserver (`npm start`) og deploy (`npm run deploy`) fungerer
