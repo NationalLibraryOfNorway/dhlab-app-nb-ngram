@@ -18,8 +18,8 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
     const [isZoomed, setIsZoomed] = useState(false);
-    const [zoomStart, setZoomStart] = useState(null);
-    const [zoomEnd, setZoomEnd] = useState(null);
+    const [zoomStart, setZoomStart] = useState(MIN_YEAR);
+    const [zoomEnd, setZoomEnd] = useState(MAX_YEAR);
     const [currentZoomState, setCurrentZoomState] = useState(null);
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [selectedYear, setSelectedYear] = useState(null);
@@ -109,6 +109,8 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
 
     useEffect(() => {
         if (!data || !data.series) return;
+
+
 
         // Log raw data for debugging
         console.log('Raw data from API:', data);
@@ -201,6 +203,9 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
         if (chartInstance.current) {
             chartInstance.current.destroy();
         }
+
+        const lastYear = data?.dates?.length ? data.dates[data.dates.length - 1] : MAX_YEAR;
+        const chartMaxYear = Math.min(settings.zoomEnd, lastYear);
 
         // Create new chart
         chartInstance.current = new Chart(ctx, {
@@ -305,7 +310,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                         type: 'linear',
                         position: 'bottom',
                         min: currentZoomState ? Math.floor(currentZoomState.start) : settings.zoomStart,
-                        max: currentZoomState ? Math.ceil(currentZoomState.end) : settings.zoomEnd,
+                        max: currentZoomState ? Math.ceil(currentZoomState.end) : chartMaxYear, // settings.zoomEnd,
                         ticks: {
                             callback: function(value) {
                                 return Math.round(value);
