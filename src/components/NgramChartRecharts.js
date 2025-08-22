@@ -310,7 +310,9 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                             callback: function(value) {
                                 return Math.round(value);
                             },
-                            stepSize: 1
+                            stepSize: 1,
+                            autoSkip: true,         // Legg til denne
+                            maxTicksLimit: 10       // begrenser antall ticks
                         }
                     },
                     y: {

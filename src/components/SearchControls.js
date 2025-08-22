@@ -119,7 +119,29 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
         link.click();
         setShowDownloadModal(false);
     };
+    const handleHiResDownload = () => {
+        if (!data?.series) return;
+        const canvas = document.querySelector('canvas');
+        if (!canvas) return;
 
+        // Lag et nytt, større canvas
+        const scale = 4; // Øk oppløsningen 3x
+        const hiResCanvas = document.createElement('canvas');
+        hiResCanvas.width = canvas.width * scale;
+        hiResCanvas.height = canvas.height * scale;
+        const ctx = hiResCanvas.getContext('2d');
+
+        // Tegn original-canvas inn i det nye, skalerte canvaset
+        ctx.scale(scale, scale);
+        ctx.drawImage(canvas, 0, 0);
+
+        // Last ned det høyoppløselige bildet
+        const link = document.createElement('a');
+        link.download = `ngram_graph_hires_${new Date().toISOString().split('T')[0]}.png`;
+        link.href = hiResCanvas.toDataURL('image/png');
+        link.click();
+        setShowDownloadModal(false);
+    };
     const handleDownloadCSV = () => {
         if (!data?.series) return;
         // Create CSV content
@@ -387,6 +409,12 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
                             onClick={handleDownload}
                         >
                             Last ned som bilde
+                        </Button>
+                        <Button
+                            variant="outline-primary"
+                            onClick={handleHiResDownload}
+                        >
+                            Last ned høyoppløselig bilde
                         </Button>
                         <Button
                             variant="outline-primary"
