@@ -126,3 +126,8 @@
 - GitHub Pages er satt opp for repoet og fungerer med riktig URL.
 - Grafen (Chart.js) viser nå kun relevante årstall på x-aksen, takket være bruk av siste år i dataene som øvre grense (`chartMaxYear`). Dette løser problemet med at x-aksen tidligere gikk til 2050 ved bruk av `maxTicksLimit`.
 - Lokal utviklingsserver (`npm start`) og deploy (`npm run deploy`) fungerer
+
+## 2025-08-25: Høyoppløselig PNG og JPG-nedlasting
+
+- Lagt til funksjonalitet for nedlasting av grafen som høyoppløselig PNG og JPG direkte fra SearchControls.
+- Brukere kan nå enkelt laste ned bilder som egner seg for bruk i publikasjoner
