@@ -19,6 +19,12 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
     const [smoothing, setSmoothing] = useState(4);
     const [lineThickness, setLineThickness] = useState(2);
     const [lineTransparency, setLineTransparency] = useState(0.1);
+    const [palette, setPalette] = useState('standard');
+    const palettes = [
+        { id: 'standard', label: 'Standard' },
+        { id: 'colorblind', label: 'Fargeblindvennlig' },
+        { id: 'bw', label: 'Svart/hvitt' }
+    ];
     const [showSettings, setShowSettings] = useState(false);
     const [settings, setSettings] = useState({
         capitalization,
@@ -110,38 +116,46 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
         { code: 'fkv', label: 'Kvensk', fullName: 'Kainun kieli' }
     ];
 
-    const handleDownload = () => {
-        if (!data?.series) return;
-        const canvas = document.querySelector('canvas');
-        const link = document.createElement('a');
-        link.download = `ngram_graph_${new Date().toISOString().split('T')[0]}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        setShowDownloadModal(false);
-    };
-    const handleHiResDownload = () => {
-        if (!data?.series) return;
-        const canvas = document.querySelector('canvas');
-        if (!canvas) return;
+    const handleHiResDownloadPNG = () => {
+    if (!data?.series) return;
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
 
-        // Lag et nytt, større canvas
-        const scale = 4; // Øk oppløsningen 3x
-        const hiResCanvas = document.createElement('canvas');
-        hiResCanvas.width = canvas.width * scale;
-        hiResCanvas.height = canvas.height * scale;
-        const ctx = hiResCanvas.getContext('2d');
+    const scale = 4; // Gir god kvalitet for publisering
+    const hiResCanvas = document.createElement('canvas');
+    hiResCanvas.width = canvas.width * scale;
+    hiResCanvas.height = canvas.height * scale;
+    const ctx = hiResCanvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.drawImage(canvas, 0, 0);
 
-        // Tegn original-canvas inn i det nye, skalerte canvaset
-        ctx.scale(scale, scale);
-        ctx.drawImage(canvas, 0, 0);
+    const link = document.createElement('a');
+    link.download = `ngram_graph_hires_${new Date().toISOString().split('T')[0]}.png`;
+    link.href = hiResCanvas.toDataURL('image/png');
+    link.click();
+    setShowDownloadModal(false);
+};
 
-        // Last ned det høyoppløselige bildet
-        const link = document.createElement('a');
-        link.download = `ngram_graph_hires_${new Date().toISOString().split('T')[0]}.png`;
-        link.href = hiResCanvas.toDataURL('image/png');
-        link.click();
-        setShowDownloadModal(false);
-    };
+const handleHiResDownloadJPG = () => {
+    if (!data?.series) return;
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+
+    const scale = 4; // Gir god kvalitet for publisering
+    const hiResCanvas = document.createElement('canvas');
+    hiResCanvas.width = canvas.width * scale;
+    hiResCanvas.height = canvas.height * scale;
+    const ctx = hiResCanvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.drawImage(canvas, 0, 0);
+
+    const link = document.createElement('a');
+    link.download = `ngram_graph_hires_${new Date().toISOString().split('T')[0]}.jpg`;
+    link.href = hiResCanvas.toDataURL('image/jpeg', 1.0);
+    link.click();
+    setShowDownloadModal(false);
+};
+
     const handleDownloadCSV = () => {
         if (!data?.series) return;
         // Create CSV content
@@ -400,21 +414,21 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
 
             <Modal show={showDownloadModal} onHide={() => setShowDownloadModal(false)} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Last ned data</Modal.Title>
+                    <Modal.Title>Last ned graf</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="d-grid gap-3">
                         <Button
                             variant="outline-primary"
-                            onClick={handleDownload}
+                            onClick={handleHiResDownloadPNG}
                         >
-                            Last ned som bilde
+                            Last ned høyoppløselig PNG
                         </Button>
                         <Button
                             variant="outline-primary"
-                            onClick={handleHiResDownload}
+                            onClick={handleHiResDownloadJPG}
                         >
-                            Last ned høyoppløselig bilde
+                            Last ned høyoppløselig JPG
                         </Button>
                         <Button
                             variant="outline-primary"
@@ -428,6 +442,9 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
                         >
                             Last ned som Excel
                         </Button>
+                    </div>
+                    <div className="mt-3 text-muted" style={{fontSize: '0.95em'}}>
+                        Bildene egner seg for bruk i publikasjoner og tidsskrifter.
                     </div>
                 </Modal.Body>
             </Modal>
@@ -469,7 +486,23 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
                                 }}
                             />
                         </div>
-
+                        <div>
+                            <Form.Label>Fargepalett</Form.Label>
+                            <Form.Select
+                                value={palette}
+                                onChange={e => {
+                                    setPalette(e.target.value);
+                                    onSettingsChange?.({
+                                        ...settings,
+                                        palette: e.target.value
+                                    });
+                                }}
+                            >
+                                {palettes.map(p => (
+                                    <option key={p.id} value={p.id}>{p.label}</option>
+                                ))}
+                            </Form.Select>
+                        </div>
                         <div>
                             <Form.Label>Linjetykkelse: {lineThickness}px</Form.Label>
                             <Form.Range

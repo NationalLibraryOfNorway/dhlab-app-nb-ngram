@@ -4,7 +4,7 @@ import { Chart, registerables } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import * as XLSX from 'xlsx';
 import { MIN_YEAR, MAX_YEAR } from '../services/ngramProcessor';
-import { FaUndo } from 'react-icons/fa';
+import { FaUndo, FaFileImage } from 'react-icons/fa'; // Legg til FaFileImage
 
 // Register Chart.js components and zoom plugin
 Chart.register(...registerables, zoomPlugin);
