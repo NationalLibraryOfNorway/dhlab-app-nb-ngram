@@ -26,11 +26,13 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
         { id: 'bw', label: 'Svart/hvitt' }
     ];
     const [showSettings, setShowSettings] = useState(false);
+    const [scaling, setScaling] = useState(100); // Standard for prosent
     const [settings, setSettings] = useState({
         capitalization,
         smoothing,
         lineThickness,
         lineTransparency,
+        scaling,
         zoomStart: MIN_YEAR,
         zoomEnd: MAX_YEAR
     });
@@ -542,7 +544,28 @@ const handleHiResDownloadJPG = () => {
                                 }}
                             />
                         </div>
-
+                        <div>
+                            <Form.Label>Multiplikator for y-aksen</Form.Label>
+                            <Form.Select
+                                value={scaling}
+                                onChange={e => {
+                                    const value = parseInt(e.target.value, 10);
+                                    setScaling(value);
+                                    onSettingsChange?.({
+                                        ...settings,
+                                        scaling: value
+                                    });
+                                }}
+                            >
+                                <option value={1}>1 (ingen)</option>
+                                <option value={10}>10</option>
+                                <option value={100}>100 (prosent)</option>
+                                <option value={1000}>1000 (promille)</option>
+                                <option value={100000}>100 000 (pr 100 000)</option>
+                                <option value={1000000}>1 000 000 (ppm parts pr million)</option>
+                                
+                            </Form.Select>
+                        </div>
                         <div>
                             <Form.Label>Zoom startår: {settings.zoomStart}</Form.Label>
                             <Form.Range

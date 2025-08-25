@@ -25,7 +25,6 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
     const [selectedYear, setSelectedYear] = useState(null);
     const [selectedWord, setSelectedWord] = useState(null);
     const [isNarrow, setIsNarrow] = useState(false);
-
     // Add resize observer to detect container width
     useEffect(() => {
         const resizeObserver = new ResizeObserver(entries => {
@@ -34,7 +33,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                 setIsNarrow(width < 992); // Bootstrap's lg breakpoint
             }
         });
-
+        
         if (chartRef.current) {
             resizeObserver.observe(chartRef.current.parentElement);
         }
@@ -110,6 +109,8 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
     useEffect(() => {
         if (!data || !data.series) return;
 
+// ...inne i useEffect, før datasets lages...
+        const scaling = settings.scaling !== undefined ? settings.scaling : 100; // 100 for prosent som default
 
 
         // Log raw data for debugging
@@ -170,6 +171,13 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                     return yearTotal > 0 ? value / yearTotal : 0;
                 });
             }
+
+            // Legg til multiplikator for relativ visning
+                if (graphType === 'relative') {
+                    values = values.map(v => v * scaling/100);
+                }
+
+
 
             const strokeWidth = settings?.lineThickness || 2;
 
@@ -338,7 +346,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                 chartInstance.current.destroy();
             }
         };
-    }, [data, graphType, currentZoomState, settings.smoothing, settings.lineThickness, settings.lineTransparency, isNarrow, settings.zoomStart, settings.zoomEnd]);
+    }, [data, graphType, currentZoomState, settings.smoothing, settings.lineThickness, settings.lineTransparency, isNarrow, settings.zoomStart, settings.zoomEnd, settings.scaling]);
 
     return (
         <div className="d-flex flex-column flex-lg-row gap-3">
