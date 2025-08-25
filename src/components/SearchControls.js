@@ -33,6 +33,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, onSettingsChange })
         lineThickness,
         lineTransparency,
         scaling,
+        palette,
         zoomStart: MIN_YEAR,
         zoomEnd: MAX_YEAR
     });

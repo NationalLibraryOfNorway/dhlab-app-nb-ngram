@@ -24,6 +24,13 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [selectedYear, setSelectedYear] = useState(null);
     const [selectedWord, setSelectedWord] = useState(null);
+    const colorPalettes = {
+        standard: ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'],
+        colorblind: ['#E69F00', '#56B4E9', '#009E73', '#F0E442', '#0072B2'],
+        bw: ['#000000', '#444444', '#888888', '#CCCCCC', '#EEEEEE']
+    };
+    const palette = settings.palette || 'standard';
+    const colors = colorPalettes[palette];
     const [isNarrow, setIsNarrow] = useState(false);
     // Add resize observer to detect container width
     useEffect(() => {
@@ -184,22 +191,16 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
             return {
                 label: series.name,
                 data: values,
-                borderColor: series.name === 'bok' ? `rgba(31, 119, 180, ${1 - (settings?.lineTransparency || 0.1)})` : 
-                            series.name === 'avis' ? `rgba(255, 127, 14, ${1 - (settings?.lineTransparency || 0.1)})` :
-                            `hsla(${(index * 360) / data.series.length}, 70%, 50%, ${1 - (settings?.lineTransparency || 0.1)})`,
-                backgroundColor: series.name === 'bok' ? 'rgba(31, 119, 180, 0.1)' :
-                                series.name === 'avis' ? 'rgba(255, 127, 14, 0.1)' :
-                                `hsla(${(index * 360) / data.series.length}, 70%, 50%, 0.1)`,
-                borderWidth: strokeWidth,
-                pointRadius: 0,  // Hide points by default
-                pointHoverRadius: 12,  // Show larger points on hover
-                pointHitRadius: 20,  // Keep large hit area for better click detection
+                borderColor: colors[index % colors.length],      // Bruk valgt palett
+                backgroundColor: colors[index % colors.length],  // Bruk valgt palett
+                borderWidth: settings?.lineThickness || 2,
+                pointRadius: 0,
+                pointHoverRadius: 12,
+                pointHitRadius: 20,
                 pointStyle: 'circle',
                 tension: 0.4,
                 showLine: true,
-                pointBackgroundColor: series.name === 'bok' ? '#1f77b4' : 
-                                    series.name === 'avis' ? '#ff7f0e' :
-                                    `hsl(${(index * 360) / data.series.length}, 70%, 50%)`,
+                pointBackgroundColor: colors[index % colors.length], // Bruk valgt palett
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2
             };
