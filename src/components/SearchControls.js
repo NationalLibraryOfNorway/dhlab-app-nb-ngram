@@ -467,146 +467,155 @@ const handleHiResDownloadJPG = () => {
                                 onChange={(e) => updateCapitalization(e.target.checked)}
                             />
                         </div>
-                        
-                        <div>
-                            <Form.Label>Utjevning av kurve: {smoothing} år</Form.Label>
-                            <Form.Range
-                                min={0}
-                                max={20}
-                                value={smoothing}
-                                onChange={(e) => {
-                                    const newValue = parseInt(e.target.value);
-                                    setSmoothing(newValue);
-                                    onSettingsChange?.({ 
-                                        capitalization, 
-                                        smoothing: newValue,
-                                        lineThickness,
-                                        lineTransparency
-                                    });
-                                    if (words) {
-                                        onSearch(words.split(',').map(w => w.trim()).filter(w => w.length > 0), corpus, lang, graphType);
-                                    }
-                                }}
-                            />
+                        <div> 
+                            <strong style={{ fontSize: '1.2em', color: 'rgba(190, 111, 20, 0.77)' }}>Grafinnstillinger</strong>
+                            <div style={{ paddingLeft: '1em' }}>
+                                <div>
+                                    <Form.Label>Utjevning av kurve: {smoothing} år</Form.Label>
+                                    <Form.Range
+                                        min={0}
+                                        max={20}
+                                        value={smoothing}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value);
+                                            setSmoothing(newValue);
+                                            onSettingsChange?.({ 
+                                                capitalization, 
+                                                smoothing: newValue,
+                                                lineThickness,
+                                                lineTransparency
+                                            });
+                                            if (words) {
+                                                onSearch(words.split(',').map(w => w.trim()).filter(w => w.length > 0), corpus, lang, graphType);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <Form.Label>Fargepalett</Form.Label>
+                                    <Form.Select
+                                        value={palette}
+                                        onChange={e => {
+                                            setPalette(e.target.value);
+                                            onSettingsChange?.({
+                                                ...settings,
+                                                palette: e.target.value
+                                            });
+                                        }}
+                                    >
+                                        {palettes.map(p => (
+                                            <option key={p.id} value={p.id}>{p.label}</option>
+                                        ))}
+                                    </Form.Select>
+                                </div>
+                                <div>
+                                    <Form.Label>Linjetykkelse: {lineThickness}px</Form.Label>
+                                    <Form.Range
+                                        min={1}
+                                        max={10}
+                                        value={lineThickness}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value);
+                                            setLineThickness(newValue);
+                                            onSettingsChange?.({ 
+                                                capitalization, 
+                                                smoothing,
+                                                lineThickness: newValue,
+                                                lineTransparency
+                                            });
+                                        }}
+                                    />
+                                </div>
+                            
+                                <div>
+                                    <Form.Label>Transparens: {Math.round(lineTransparency * 100)}%</Form.Label>
+                                    <Form.Range
+                                        min={0}
+                                        max={100}
+                                        value={lineTransparency * 100}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value) / 100;
+                                            setLineTransparency(newValue);
+                                            onSettingsChange?.({ 
+                                                capitalization, 
+                                                smoothing,
+                                                lineThickness,
+                                                lineTransparency: newValue,
+                                                zoomStart: settings.zoomStart,
+                                                zoomEnd: settings.zoomEnd
+                                            });
+                                        }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div>
-                            <Form.Label>Fargepalett</Form.Label>
-                            <Form.Select
-                                value={palette}
-                                onChange={e => {
-                                    setPalette(e.target.value);
-                                    onSettingsChange?.({
-                                        ...settings,
-                                        palette: e.target.value
-                                    });
-                                }}
-                            >
-                                {palettes.map(p => (
-                                    <option key={p.id} value={p.id}>{p.label}</option>
-                                ))}
-                            </Form.Select>
-                        </div>
-                        <div>
-                            <Form.Label>Linjetykkelse: {lineThickness}px</Form.Label>
-                            <Form.Range
-                                min={1}
-                                max={10}
-                                value={lineThickness}
-                                onChange={(e) => {
-                                    const newValue = parseInt(e.target.value);
-                                    setLineThickness(newValue);
-                                    onSettingsChange?.({ 
-                                        capitalization, 
-                                        smoothing,
-                                        lineThickness: newValue,
-                                        lineTransparency
-                                    });
-                                }}
-                            />
-                        </div>
+                            <strong style={{ fontSize: '1.2em', color: 'rgba(190, 111, 20, 0.77)' }}>Innstillinger for akser</strong>
+                            <div style={{ paddingLeft: '1em' }}>
+                                <div>
+                                    <Form.Label>Multiplikator for y-aksen</Form.Label>
+                                    <Form.Select
+                                        value={scaling}
+                                        onChange={e => {
+                                            const value = parseInt(e.target.value, 10);
+                                            setScaling(value);
+                                            onSettingsChange?.({
+                                                ...settings,
+                                                scaling: value
+                                            });
+                                        }}
+                                    >
+                                        <option value={1}>1 (ingen)</option>
+                                        <option value={10}>10</option>
+                                        <option value={100}>100 (prosent)</option>
+                                        <option value={1000}>1000 (promille)</option>
+                                        <option value={100000}>100 000 (pr 100 000)</option>
+                                        <option value={1000000}>1 000 000 (ppm parts pr million)</option>
+                                        
+                                    </Form.Select>
+                                </div>
+                                <div>
+                                    <Form.Label>Zoom startår: {settings.zoomStart}</Form.Label>
+                                    <Form.Range
+                                        min={MIN_YEAR}
+                                        max={MAX_YEAR}
+                                        value={settings.zoomStart}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value);
+                                            setSettings(prev => ({ ...prev, zoomStart: newValue }));
+                                            onSettingsChange?.({ 
+                                                capitalization, 
+                                                smoothing,
+                                                lineThickness,
+                                                lineTransparency,
+                                                zoomStart: newValue,
+                                                zoomEnd: settings.zoomEnd
+                                            });
+                                        }}
+                                    />
+                                </div>
 
-                        <div>
-                            <Form.Label>Transparens: {Math.round(lineTransparency * 100)}%</Form.Label>
-                            <Form.Range
-                                min={0}
-                                max={100}
-                                value={lineTransparency * 100}
-                                onChange={(e) => {
-                                    const newValue = parseInt(e.target.value) / 100;
-                                    setLineTransparency(newValue);
-                                    onSettingsChange?.({ 
-                                        capitalization, 
-                                        smoothing,
-                                        lineThickness,
-                                        lineTransparency: newValue,
-                                        zoomStart: settings.zoomStart,
-                                        zoomEnd: settings.zoomEnd
-                                    });
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <Form.Label>Multiplikator for y-aksen</Form.Label>
-                            <Form.Select
-                                value={scaling}
-                                onChange={e => {
-                                    const value = parseInt(e.target.value, 10);
-                                    setScaling(value);
-                                    onSettingsChange?.({
-                                        ...settings,
-                                        scaling: value
-                                    });
-                                }}
-                            >
-                                <option value={1}>1 (ingen)</option>
-                                <option value={10}>10</option>
-                                <option value={100}>100 (prosent)</option>
-                                <option value={1000}>1000 (promille)</option>
-                                <option value={100000}>100 000 (pr 100 000)</option>
-                                <option value={1000000}>1 000 000 (ppm parts pr million)</option>
-                                
-                            </Form.Select>
-                        </div>
-                        <div>
-                            <Form.Label>Zoom startår: {settings.zoomStart}</Form.Label>
-                            <Form.Range
-                                min={MIN_YEAR}
-                                max={MAX_YEAR}
-                                value={settings.zoomStart}
-                                onChange={(e) => {
-                                    const newValue = parseInt(e.target.value);
-                                    setSettings(prev => ({ ...prev, zoomStart: newValue }));
-                                    onSettingsChange?.({ 
-                                        capitalization, 
-                                        smoothing,
-                                        lineThickness,
-                                        lineTransparency,
-                                        zoomStart: newValue,
-                                        zoomEnd: settings.zoomEnd
-                                    });
-                                }}
-                            />
-                        </div>
-
-                        <div>
-                            <Form.Label>Zoom sluttår: {settings.zoomEnd}</Form.Label>
-                            <Form.Range
-                                min={MIN_YEAR}
-                                max={MAX_YEAR}
-                                value={settings.zoomEnd}
-                                onChange={(e) => {
-                                    const newValue = parseInt(e.target.value);
-                                    setSettings(prev => ({ ...prev, zoomEnd: newValue }));
-                                    onSettingsChange?.({ 
-                                        capitalization, 
-                                        smoothing,
-                                        lineThickness,
-                                        lineTransparency,
-                                        zoomStart: settings.zoomStart,
-                                        zoomEnd: newValue
-                                    });
-                                }}
-                            />
+                                <div>
+                                    <Form.Label>Zoom sluttår: {settings.zoomEnd}</Form.Label>
+                                    <Form.Range
+                                        min={MIN_YEAR}
+                                        max={MAX_YEAR}
+                                        value={settings.zoomEnd}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value);
+                                            setSettings(prev => ({ ...prev, zoomEnd: newValue }));
+                                            onSettingsChange?.({ 
+                                                capitalization, 
+                                                smoothing,
+                                                lineThickness,
+                                                lineTransparency,
+                                                zoomStart: settings.zoomStart,
+                                                zoomEnd: newValue
+                                            });
+                                        }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </Modal.Body>
