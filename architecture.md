@@ -93,7 +93,7 @@ Query-parametre (fra frontend):
 - `to`: sluttår
 
 Eksempel:
-`/ngram/query?terms=fred,frihet&lang=nob&case_sens=0&corpus=bok&mode=relative&smooth=1&from=1810&to=2025`
+`/ngram/query?terms=fred,frihet&lang=nob&case_sens=0&corpus=bok&mode=relative&smooth=1&from=1800&to=2025`
 
 ## 3.2 Inngående API-respons (forventet)
 Array av n-gramserier, typisk:
@@ -120,7 +120,7 @@ Frontend normaliserer dette til intern modell:
 
 ## 4.1 Legacy hash
 Eksempel:
-- `#1_1_1_fred,frihet_1_1_3_1810,2022_2_2_2_12_2`
+- `#1_1_1_fred,frihet_1_1_3_1800,2022_2_2_2_12_2`
 
 Parseren henter ut minst:
 - ord
@@ -131,7 +131,7 @@ Parseren henter ut minst:
 
 ## 4.2 V2 hash (app-kontrollert)
 Eksempel:
-- `#v2?terms=fred,frihet&mode=cumulative&corpus=bok&lang=nob&case=0&smooth=3&scale=auto&pattern=1&from=1810&to=2022`
+- `#v2?terms=fred,frihet&mode=cumulative&corpus=bok&lang=nob&case=0&smooth=3&scale=auto&pattern=1&from=1800&to=2022`
 
 Dette formatet er eksplisitt, robust og lett å rekonstruere.
 

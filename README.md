@@ -40,7 +40,7 @@ Here is a link [N-gram](https://nationallibraryofnorway.github.io/ngram/) to exp
 - DH-Lab API for N-gram data
 
 ### Key Features Implementation
-- Year range limits (1810-2025) for data consistency
+- Year range limits (1800-2025) for data consistency
 - Smoothing algorithm for trend visualization
 - Case-sensitive search options
 - Multi-language support with proper localization
