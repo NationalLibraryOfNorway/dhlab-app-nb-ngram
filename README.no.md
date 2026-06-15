@@ -39,7 +39,7 @@ En moderne og interaktiv webapplikasjon for utforsking av ordhyppighet i Nasjona
 - DH-Lab API for ngram-data  
 
 ### Nøkkelfunksjoner
-- Årsbegrensning (1810–2025) for konsistens  
+- Årsbegrensning (1800–2025) for konsistens  
 - Glattemetode for trendvisning  
 - Store/små bokstav-sensitivt søk  
 - Flerespråklig støtte og lokaltilpasning  

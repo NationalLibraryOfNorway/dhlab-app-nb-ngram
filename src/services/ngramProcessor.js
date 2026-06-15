@@ -1,5 +1,5 @@
 // Constants for N-gram processing
-const MIN_YEAR = 1810;
+const MIN_YEAR = 1800;
 const MAX_YEAR = new Date().getFullYear();
 const NGRAM_API = process.env.REACT_APP_NGRAM_API || 'https://api.nb.no/dhlab/nb_ngram/ngram/query';
 const REQUEST_TIMEOUT_MS = 30000;
