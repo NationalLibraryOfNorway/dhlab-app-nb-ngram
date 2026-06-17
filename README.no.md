@@ -71,6 +71,10 @@ npm start
 npm run build
 ```
 
+### Oppdatering og publisering
+
+Se [`oppdatering.md`](oppdatering.md) for praktisk arbeidsflyt for deploy og publisering.
+
 ## Om utviklingen
 
 Dette prosjektet er et samarbeid mellom utviklere og AI-verktøy:

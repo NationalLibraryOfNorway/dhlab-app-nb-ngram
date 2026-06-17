@@ -75,6 +75,7 @@ npm run build
 ### Build Targets
 - `npm run build` builds for GitHub Pages (`/ngram`).
 - `npm run build:nb` builds for NB production path (`/ngram`).
+- Publishing workflow: see [`oppdatering.md`](oppdatering.md).
 
 ## Development Process and AI Assistance
 
