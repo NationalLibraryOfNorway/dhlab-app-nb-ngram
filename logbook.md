@@ -1,5 +1,10 @@
 # Logbook
 
+## 2026-06-17
+
+- Oppfølgingspunkt: GitHub Pages-deploy viser en advarsel om at enkelte Actions fortsatt målretter Node.js 20 og midlertidig blir kjørt på Node.js 24.
+- Dette stopper ikke deploy nå, men workflow/oppsett bør ryddes i ved anledning dersom repoet får egne GitHub Actions-workflows eller avhengigheter til eldre Actions-versjoner.
+
 ## 2024-03-19: Ngram Visualization Improvements
 
 ### Cohort Analysis Fix
