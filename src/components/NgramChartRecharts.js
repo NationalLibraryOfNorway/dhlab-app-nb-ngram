@@ -236,6 +236,9 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
     useEffect(() => {
         if (!data || !data.series) return;
 
+        const usesFunctionWordRelative = graphType === 'relative'
+            && corpusType === 'avis'
+            && settings?.relativeNormalization === 'functionWords';
         const maxRelativePercent = data.series.reduce((maxValue, series) => {
             const seriesMax = series.data.reduce(
                 (seriesValue, point) => Math.max(seriesValue, Number(point) || 0),
@@ -252,6 +255,12 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                 : Number.parseInt(requestedScaling, 10) || PERCENT_SCALING);
         const scalingFactor = effectiveScaling / 100;
         const relativeUnitLabel = effectiveScaling === PPM_SCALING ? 'ppm' : '%';
+        const relativeValueSuffix = usesFunctionWordRelative
+            ? ` ${relativeUnitLabel} (estimert fra funksjonsord-baseline)`
+            : ` ${relativeUnitLabel}`;
+        const relativeAxisTitle = usesFunctionWordRelative
+            ? `Estimert frekvens fra funksjonsord-baseline (${relativeUnitLabel})`
+            : `Frekvens (${relativeUnitLabel})`;
         const lineAlpha = Math.max(0.05, Math.min(1, 1 - (settings.lineTransparency ?? 0)));
 
 
@@ -477,7 +486,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                                 if (context.parsed.y !== null) {
                                     label += formatNumberNoGrouping(context.parsed.y);
                                     if (graphType === 'relative') {
-                                        label += ` ${relativeUnitLabel}`;
+                                        label += relativeValueSuffix;
                                     }
                                 }
                                 return label;
@@ -504,12 +513,15 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                         beginAtZero: true,
                         title: {
                             display: graphType === 'relative',
-                            text: graphType === 'relative' ? `Frekvens (${relativeUnitLabel})` : ''
+                            text: graphType === 'relative' ? relativeAxisTitle : ''
                         },
                         ticks: {
                             callback: function(value) {
                                 const formatted = formatNumberNoGrouping(value);
-                                return graphType === 'relative' ? `${formatted} ${relativeUnitLabel}` : formatted;
+                                if (graphType !== 'relative') {
+                                    return formatted;
+                                }
+                                return `${formatted} ${relativeUnitLabel}`;
                             }
                         }
                     }
@@ -523,7 +535,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                 chartInstance.current.destroy();
             }
         };
-    }, [data, graphType, settings.smoothing, settings.lineThickness, settings.lineTransparency, settings.curvePattern, curvePatternColorMode, isNarrow, settings.zoomStart, settings.zoomEnd, settings.scaling, colors, handleChartClick, homeRange]);
+    }, [data, graphType, corpusType, settings.smoothing, settings.lineThickness, settings.lineTransparency, settings.curvePattern, curvePatternColorMode, isNarrow, settings.zoomStart, settings.zoomEnd, settings.scaling, settings.relativeNormalization, colors, handleChartClick, homeRange]);
 
     return (
         <div className="d-flex flex-column flex-lg-row gap-3">

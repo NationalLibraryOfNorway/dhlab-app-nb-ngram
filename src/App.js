@@ -16,6 +16,7 @@ function App() {
         smoothing: 4,
         lineThickness: 3,
         scaling: 'auto',
+        relativeNormalization: 'standard',
         curvePattern: false,
         curvePatternColorMode: 'black',
         zoomStart: MIN_YEAR,
@@ -38,6 +39,7 @@ function App() {
             case: settings?.capitalization ? '1' : '0',
             smooth: String(settings?.smoothing ?? 3),
             scale: String(settings?.scaling ?? 'auto'),
+            relNorm: String(settings?.relativeNormalization ?? 'standard'),
             pattern: settings?.curvePattern ? '1' : '0',
             patternColor: String(settings?.curvePatternColorMode ?? 'black'),
             from: String(settings?.zoomStart ?? MIN_YEAR),
@@ -55,7 +57,8 @@ function App() {
             corpus,
             lang,
             graphType,
-            capitalization: settings?.capitalization ?? false
+            capitalization: settings?.capitalization ?? false,
+            relativeNormalization: settings?.relativeNormalization ?? 'standard'
         });
 
         if (lastRequestKeyRef.current === requestKey) {

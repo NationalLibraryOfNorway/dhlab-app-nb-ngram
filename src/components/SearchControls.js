@@ -39,6 +39,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
     const [smoothing, setSmoothing] = useState(legacyState.smoothing ?? 4);
     const [lineThickness, setLineThickness] = useState(3);
     const [lineTransparency, setLineTransparency] = useState(0.1);
+    const [relativeNormalization, setRelativeNormalization] = useState(legacyState.relativeNormalization || 'standard');
     const [curvePattern, setCurvePattern] = useState(Boolean(legacyState.curvePattern));
     const [curvePatternColorMode, setCurvePatternColorMode] = useState(legacyState.curvePatternColorMode || 'black');
     const [palette, setPalette] = useState('standard');
@@ -67,6 +68,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
             smoothing,
             lineThickness,
             lineTransparency,
+            relativeNormalization,
             curvePattern,
             curvePatternColorMode,
             scaling,
@@ -75,7 +77,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
             zoomEnd,
             ...overrides
         });
-    }, [onSettingsChange, capitalization, smoothing, lineThickness, lineTransparency, curvePattern, curvePatternColorMode, scaling, palette, zoomStart, zoomEnd]);
+    }, [onSettingsChange, capitalization, smoothing, lineThickness, lineTransparency, relativeNormalization, curvePattern, curvePatternColorMode, scaling, palette, zoomStart, zoomEnd]);
     const updateCapitalization = (newValue) => {
         setCapitalization(newValue);
         emitSettings({ capitalization: newValue });
@@ -162,6 +164,22 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
     }, [corpus, lang, graphType]);
 
     useEffect(() => {
+        if (graphType !== 'relative' || corpus !== 'avis') {
+            return;
+        }
+
+        const currentWords = latestWordsRef.current;
+        const wordList = currentWords
+            .split(',')
+            .map(w => w.trim())
+            .filter(w => w.length > 0);
+
+        if (wordList.length > 0) {
+            onSearchRef.current(wordList, corpus, lang, graphType);
+        }
+    }, [relativeNormalization, corpus, graphType, lang]);
+
+    useEffect(() => {
         if (legacyState.words.length === 0) {
             onSearchRef.current([DEFAULT_START_TERM], corpus, lang, graphType);
             return;
@@ -174,6 +192,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
             smoothing,
             lineThickness,
             lineTransparency,
+            relativeNormalization,
             curvePattern,
             curvePatternColorMode,
             scaling,
@@ -537,6 +556,25 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                         <div>
                             <strong className="help-section-title">Akse og skala</strong>
                             <div style={{ paddingLeft: '1em' }}>
+                                {graphType === 'relative' && corpus === 'avis' && (
+                                    <div className="settings-option-card">
+                                        <Form.Label>Relativ normalisering</Form.Label>
+                                        <Form.Select
+                                            value={relativeNormalization}
+                                            onChange={e => {
+                                                const value = e.target.value;
+                                                setRelativeNormalization(value);
+                                                emitSettings({ relativeNormalization: value });
+                                            }}
+                                        >
+                                            <option value="standard">Standard (% eller ppm)</option>
+                                            <option value="functionWords">Funksjonsord-baseline (estimert)</option>
+                                        </Form.Select>
+                                        <div className="text-muted help-muted" style={{ fontSize: '0.9em', marginTop: '0.4rem' }}>
+                                            Funksjonsord-baseline bruker ordene og, på, av, det, der, har, er, med, paa og af som referansegrunnlag, og skalerer med en fast faktor for å estimere vanlig relativfrekvens.
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="settings-option-card">
                                     <Form.Label>Skalering av y-aksen</Form.Label>
                                     <Form.Select
