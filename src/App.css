@@ -234,6 +234,22 @@
   background: var(--color-bg-soft);
 }
 
+.settings-help-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.settings-help-button:hover {
+  color: var(--color-accent);
+}
+
 .period-range-labels {
   display: flex;
   justify-content: space-between;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Form, Button, ButtonGroup, InputGroup, Modal } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
-import { FiSettings } from 'react-icons/fi';
+import { FiHelpCircle, FiSettings } from 'react-icons/fi';
 import { MIN_YEAR, MAX_YEAR } from '../services/ngramProcessor';
 import { parseLegacyHash } from '../services/legacyHash';
 const DEFAULT_START_TERM = 'demokrati';
@@ -35,6 +35,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
     const [showCorpusDropdown, setShowCorpusDropdown] = useState(false);
     const [showGraphTypeDropdown, setShowGraphTypeDropdown] = useState(false);
     const [showToolsModal, setShowToolsModal] = useState(false);
+    const [showRelativeNormalizationHelp, setShowRelativeNormalizationHelp] = useState(false);
     const [capitalization, setCapitalization] = useState(Boolean(legacyState.capitalization));
     const [smoothing, setSmoothing] = useState(legacyState.smoothing ?? 4);
     const [lineThickness, setLineThickness] = useState(3);
@@ -558,7 +559,18 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                             <div style={{ paddingLeft: '1em' }}>
                                 {graphType === 'relative' && corpus === 'avis' && (
                                     <div className="settings-option-card">
-                                        <Form.Label>Relativ normalisering</Form.Label>
+                                        <div className="d-flex align-items-center justify-content-between gap-2">
+                                            <Form.Label className="mb-0">Relativ normalisering</Form.Label>
+                                            <button
+                                                type="button"
+                                                className="settings-help-button"
+                                                aria-label="Forklaring av relativ normalisering"
+                                                title="Forklaring av relativ normalisering"
+                                                onClick={() => setShowRelativeNormalizationHelp(true)}
+                                            >
+                                                <FiHelpCircle aria-hidden="true" />
+                                            </button>
+                                        </div>
                                         <Form.Select
                                             value={relativeNormalization}
                                             onChange={e => {
@@ -571,7 +583,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                             <option value="functionWords">Funksjonsord-baseline (estimert)</option>
                                         </Form.Select>
                                         <div className="text-muted help-muted" style={{ fontSize: '0.9em', marginTop: '0.4rem' }}>
-                                            Funksjonsord-baseline bruker ordene og, på, av, det, der, har, er, med, paa og af som referansegrunnlag, og skalerer med en fast faktor for å estimere vanlig relativfrekvens.
+                                            For aviser kan funksjonsord-baseline gi mer stabile estimater enn vanlig relativfrekvens.
                                         </div>
                                     </div>
                                 )}
@@ -610,6 +622,22 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                             </div>
                         </div>
                     </div>
+                </Modal.Body>
+            </Modal>
+            <Modal show={showRelativeNormalizationHelp} onHide={() => setShowRelativeNormalizationHelp(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Relativ normalisering for aviser</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        For aviskorpuset kan relativ frekvens også beregnes med funksjonsord-baseline.
+                    </p>
+                    <p>
+                        Metoden bruker ordene <code>og</code>, <code>på</code>, <code>av</code>, <code>det</code>, <code>der</code>, <code>har</code>, <code>er</code>, <code>med</code>, <code>paa</code> og <code>af</code> som et estimat på korpusstørrelsen per år, og skalerer derfra til en estimert relativ frekvens.
+                    </p>
+                    <p className="mb-0">
+                        Dette kan gi mer stabile tall i perioder der OCR- og PDF-støy gjør vanlig relativfrekvens mindre pålitelig, særlig etter 2015. Verdiene er et estimat, ikke et eksakt mål på total ordmengde.
+                    </p>
                 </Modal.Body>
             </Modal>
         </div>
