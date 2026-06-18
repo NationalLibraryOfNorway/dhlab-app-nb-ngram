@@ -185,11 +185,14 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
     };
 
     const resetZoom = () => {
-        if (chartInstance.current) {
-            chartInstance.current.resetZoom();
-            zoomWindowRef.current = null;
-            setIsZoomed(false);
-        }
+        const chart = chartInstance.current;
+        if (!chart?.options?.scales?.x) return;
+
+        chart.options.scales.x.min = homeRange.start;
+        chart.options.scales.x.max = homeRange.end;
+        chart.update('none');
+        zoomWindowRef.current = null;
+        setIsZoomed(false);
     };
 
     const handleHomeRangeStartChange = (nextValueRaw) => {
