@@ -277,17 +277,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                 values = smoothed;
             }
             
-            // Handle cumulative data
-            if (graphType === 'cumulative') {
-                let sum = 0;
-                values = values.map(val => {
-                    sum += val;
-                    return sum;
-                });
-            }
-            
-            // Remove unnecessary absolute value conversion
-            // The API already provides absolute counts in the 'f' field
+            // Cumulative series are already computed in the data layer.
             
             // Handle cohort data
             if (graphType === 'cohort') {

@@ -151,13 +151,14 @@ const fetchNgramData = async (words, corpus, lang, graphType = 'relative', setti
                 const values = ngram.values;
                 if (values.length > 0) {
                     // Create a map of year to value for this ngram
+                    const usesAbsoluteValues = graphType === 'absolute' || graphType === 'cumulative';
                     const yearToValue = new Map(
                         values
                             .filter(v => {
                                 const year = parseInt(v.x);
                                 return year >= MIN_YEAR && year <= MAX_YEAR;
                             })
-                            .map(v => [parseInt(v.x), graphType === 'absolute' ? v.f : v.y])
+                            .map(v => [parseInt(v.x), usesAbsoluteValues ? v.f : v.y])
                     );
                     
                     // Create data array with zeros for missing years
