@@ -158,7 +158,6 @@ const fetchNgramData = async (words, corpus, lang, graphType = 'relative', setti
         }
         const relativeNormalization = settings?.relativeNormalization || STANDARD_RELATIVE_NORMALIZATION;
         const usesFunctionWordRelative = graphType === 'relative'
-            && corpus === 'avis'
             && relativeNormalization === FUNCTION_WORD_RELATIVE_NORMALIZATION;
         const ngrams = await fetchRawNgrams(
             trimmedWords,

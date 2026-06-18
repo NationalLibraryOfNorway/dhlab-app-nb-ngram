@@ -88,6 +88,9 @@ const AppHeader = ({ data, shareUrl }) => {
                         <div className="help-section-body">
                             Relativ visning bruker automatisk <code>%</code> eller <code>ppm</code> basert på datanivå.
                             <code> ppm</code> betyr <em>parts per million</em>, altså forekomster per 1 000 000 ord.
+                            <p style={{ marginTop: '0.6rem', marginBottom: 0 }}>
+                                Under <strong>Relativt til</strong> kan du også velge funksjonsord-baseline. Metoden bruker ordene <code>og</code>, <code>på</code>, <code>av</code>, <code>det</code>, <code>der</code>, <code>har</code>, <code>er</code>, <code>med</code>, <code>paa</code> og <code>af</code> som et estimat på korpusstørrelsen per år, og skalerer derfra til en estimert relativ frekvens. Dette kan gi mer stabile tall i perioder med OCR- og PDF-støy, særlig etter 2015. Verdiene er et estimat, ikke et eksakt mål på total ordmengde.
+                            </p>
                         </div>
                     </div>
 

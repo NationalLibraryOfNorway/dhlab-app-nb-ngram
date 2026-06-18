@@ -34,6 +34,14 @@ const formatNumberNoGrouping = (value, maxDecimals = 6) => (
         maximumFractionDigits: maxDecimals
     }).format(value)
 );
+const formatChartValue = (value, graphType, unitLabel) => {
+    const decimals = graphType === 'cohort' ? 3 : 2;
+    const formatted = formatNumberNoGrouping(value, decimals);
+    if (graphType !== 'relative') {
+        return formatted;
+    }
+    return `${formatted} ${unitLabel}`;
+};
 const withAlpha = (color, alpha = TRACKER_ALPHA) => {
     if (typeof color !== 'string') {
         return color;
@@ -237,7 +245,6 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
         if (!data || !data.series) return;
 
         const usesFunctionWordRelative = graphType === 'relative'
-            && corpusType === 'avis'
             && settings?.relativeNormalization === 'functionWords';
         const maxRelativePercent = data.series.reduce((maxValue, series) => {
             const seriesMax = series.data.reduce(
@@ -255,9 +262,6 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                 : Number.parseInt(requestedScaling, 10) || PERCENT_SCALING);
         const scalingFactor = effectiveScaling / 100;
         const relativeUnitLabel = effectiveScaling === PPM_SCALING ? 'ppm' : '%';
-        const relativeValueSuffix = usesFunctionWordRelative
-            ? ` ${relativeUnitLabel} (estimert fra funksjonsord-baseline)`
-            : ` ${relativeUnitLabel}`;
         const relativeAxisTitle = usesFunctionWordRelative
             ? `Estimert frekvens fra funksjonsord-baseline (${relativeUnitLabel})`
             : `Frekvens (${relativeUnitLabel})`;
@@ -484,9 +488,9 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                                     label += ': ';
                                 }
                                 if (context.parsed.y !== null) {
-                                    label += formatNumberNoGrouping(context.parsed.y);
-                                    if (graphType === 'relative') {
-                                        label += relativeValueSuffix;
+                                    label += formatChartValue(context.parsed.y, graphType, relativeUnitLabel);
+                                    if (graphType === 'relative' && usesFunctionWordRelative) {
+                                        label += ' (estimert fra funksjonsord-baseline)';
                                     }
                                 }
                                 return label;
@@ -517,11 +521,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                         },
                         ticks: {
                             callback: function(value) {
-                                const formatted = formatNumberNoGrouping(value);
-                                if (graphType !== 'relative') {
-                                    return formatted;
-                                }
-                                return `${formatted} ${relativeUnitLabel}`;
+                                return formatChartValue(value, graphType, relativeUnitLabel);
                             }
                         }
                     }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Form, Button, ButtonGroup, InputGroup, Modal } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
-import { FiHelpCircle, FiSettings } from 'react-icons/fi';
+import { FiSettings } from 'react-icons/fi';
 import { MIN_YEAR, MAX_YEAR } from '../services/ngramProcessor';
 import { parseLegacyHash } from '../services/legacyHash';
 const DEFAULT_START_TERM = 'demokrati';
@@ -34,8 +34,8 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
     const [showLangDropdown, setShowLangDropdown] = useState(false);
     const [showCorpusDropdown, setShowCorpusDropdown] = useState(false);
     const [showGraphTypeDropdown, setShowGraphTypeDropdown] = useState(false);
+    const [showRelativeModePopup, setShowRelativeModePopup] = useState(false);
     const [showToolsModal, setShowToolsModal] = useState(false);
-    const [showRelativeNormalizationHelp, setShowRelativeNormalizationHelp] = useState(false);
     const [capitalization, setCapitalization] = useState(Boolean(legacyState.capitalization));
     const [smoothing, setSmoothing] = useState(legacyState.smoothing ?? 4);
     const [lineThickness, setLineThickness] = useState(3);
@@ -117,6 +117,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                 setShowLangDropdown(false);
                 setShowCorpusDropdown(false);
                 setShowGraphTypeDropdown(false);
+                setShowRelativeModePopup(false);
             }
         };
 
@@ -125,6 +126,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                 setShowLangDropdown(false);
                 setShowCorpusDropdown(false);
                 setShowGraphTypeDropdown(false);
+                setShowRelativeModePopup(false);
             }
         };
 
@@ -138,6 +140,19 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
             document.removeEventListener('keydown', handleEscape);
         };
     }, [showLangDropdown, showCorpusDropdown, showGraphTypeDropdown]);
+
+    useEffect(() => {
+        if (!showGraphTypeDropdown) {
+            setShowRelativeModePopup(false);
+            return;
+        }
+
+        if (graphType === 'relative') {
+            setShowRelativeModePopup(true);
+        } else {
+            setShowRelativeModePopup(false);
+        }
+    }, [showGraphTypeDropdown, graphType]);
 
     const performSearch = () => {
         const wordList = words.split(',')
@@ -165,7 +180,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
     }, [corpus, lang, graphType]);
 
     useEffect(() => {
-        if (graphType !== 'relative' || corpus !== 'avis') {
+        if (graphType !== 'relative') {
             return;
         }
 
@@ -210,10 +225,16 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
         performSearch();
     };
 
-    const handleGraphTypeSelect = (type) => {
+    const handleGraphTypeSelect = (type, closeDropdown = true) => {
         setGraphType(type);
         onGraphTypeChange(type);
         setShowModal(false);
+        if (type !== 'relative') {
+            setShowRelativeModePopup(false);
+        }
+        if (closeDropdown) {
+            setShowGraphTypeDropdown(false);
+        }
     };
 
     const graphTypes = [
@@ -235,7 +256,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
     const languageButtonLabel = corpus === 'avis'
         ? 'norsk (avis)'
         : (selectedLanguage?.fullName || lang);
-
     return (
         <div className="d-flex flex-column flex-md-row gap-3 align-items-start w-100">
             <div className="d-flex flex-column flex-md-row gap-3 align-items-start w-100">
@@ -276,6 +296,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                 setShowLangDropdown((prev) => !prev);
                                 setShowCorpusDropdown(false);
                                 setShowGraphTypeDropdown(false);
+                                setShowRelativeModePopup(false);
                             }}
                             style={{ 
                                 border: 'none',
@@ -318,6 +339,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                     setShowCorpusDropdown((prev) => !prev);
                                     setShowLangDropdown(false);
                                     setShowGraphTypeDropdown(false);
+                                    setShowRelativeModePopup(false);
                                 }}
                                 style={{ 
                                     border: 'none'
@@ -358,6 +380,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                 setShowGraphTypeDropdown((prev) => !prev);
                                 setShowLangDropdown(false);
                                 setShowCorpusDropdown(false);
+                                setShowRelativeModePopup(graphType === 'relative');
                             }}
                             style={{ 
                                 border: 'none',
@@ -379,23 +402,61 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                 top: '100%',
                                 left: 0,
                                 marginTop: '0.125rem',
-                                minWidth: '120px'
+                                minWidth: '180px'
                             }}>
+                                <div style={{ position: 'relative' }}>
+                                    <button
+                                        className={`dropdown-item d-flex align-items-center justify-content-between${graphType === 'relative' ? ' active' : ''}`}
+                                        onMouseEnter={() => setShowRelativeModePopup(true)}
+                                        onFocus={() => setShowRelativeModePopup(true)}
+                                        onClick={() => {
+                                            handleGraphTypeSelect('relative', false);
+                                            setShowRelativeModePopup(true);
+                                        }}
+                                    >
+                                        <span>relativ</span>
+                                        <span aria-hidden="true" style={{ opacity: 0.7 }}>{showRelativeModePopup ? '▾' : '▸'}</span>
+                                    </button>
+                                    {showRelativeModePopup && (
+                                        <div className="d-flex flex-column">
+                                            <button
+                                                className={`dropdown-item ps-4${relativeNormalization === 'standard' ? ' active' : ''}`}
+                                                onClick={() => {
+                                                    handleGraphTypeSelect('relative', false);
+                                                    setRelativeNormalization('standard');
+                                                    emitSettings({ relativeNormalization: 'standard' });
+                                                    setShowRelativeModePopup(false);
+                                                    setShowGraphTypeDropdown(false);
+                                                }}
+                                            >
+                                                ordmengde
+                                            </button>
+                                            <button
+                                                className={`dropdown-item ps-4${relativeNormalization === 'functionWords' ? ' active' : ''}`}
+                                                onClick={() => {
+                                                    handleGraphTypeSelect('relative', false);
+                                                    setRelativeNormalization('functionWords');
+                                                    emitSettings({ relativeNormalization: 'functionWords' });
+                                                    setShowRelativeModePopup(false);
+                                                    setShowGraphTypeDropdown(false);
+                                                }}
+                                            >
+                                                funksjonsord+
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                                 <button className="dropdown-item" onClick={() => {
-                                    handleGraphTypeSelect('relative');
-                                    setShowGraphTypeDropdown(false);
-                                }}>relativ</button>
-                                <button className="dropdown-item" onClick={() => {
+                                    setShowRelativeModePopup(false);
                                     handleGraphTypeSelect('absolute');
-                                    setShowGraphTypeDropdown(false);
                                 }}>absolutt</button>
                                 <button className="dropdown-item" onClick={() => {
+                                    setShowRelativeModePopup(false);
                                     handleGraphTypeSelect('cumulative');
-                                    setShowGraphTypeDropdown(false);
                                 }}>kumulativ</button>
                                 <button className="dropdown-item" onClick={() => {
+                                    setShowRelativeModePopup(false);
                                     handleGraphTypeSelect('cohort');
-                                    setShowGraphTypeDropdown(false);
                                 }}>kohort</button>
                             </div>
                         )}
@@ -557,36 +618,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                         <div>
                             <strong className="help-section-title">Akse og skala</strong>
                             <div style={{ paddingLeft: '1em' }}>
-                                {graphType === 'relative' && corpus === 'avis' && (
-                                    <div className="settings-option-card">
-                                        <div className="d-flex align-items-center justify-content-between gap-2">
-                                            <Form.Label className="mb-0">Relativ normalisering</Form.Label>
-                                            <button
-                                                type="button"
-                                                className="settings-help-button"
-                                                aria-label="Forklaring av relativ normalisering"
-                                                title="Forklaring av relativ normalisering"
-                                                onClick={() => setShowRelativeNormalizationHelp(true)}
-                                            >
-                                                <FiHelpCircle aria-hidden="true" />
-                                            </button>
-                                        </div>
-                                        <Form.Select
-                                            value={relativeNormalization}
-                                            onChange={e => {
-                                                const value = e.target.value;
-                                                setRelativeNormalization(value);
-                                                emitSettings({ relativeNormalization: value });
-                                            }}
-                                        >
-                                            <option value="standard">Standard (% eller ppm)</option>
-                                            <option value="functionWords">Funksjonsord-baseline (estimert)</option>
-                                        </Form.Select>
-                                        <div className="text-muted help-muted" style={{ fontSize: '0.9em', marginTop: '0.4rem' }}>
-                                            For aviser kan funksjonsord-baseline gi mer stabile estimater enn vanlig relativfrekvens.
-                                        </div>
-                                    </div>
-                                )}
                                 <div className="settings-option-card">
                                     <Form.Label>Skalering av y-aksen</Form.Label>
                                     <Form.Select
@@ -622,22 +653,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                             </div>
                         </div>
                     </div>
-                </Modal.Body>
-            </Modal>
-            <Modal show={showRelativeNormalizationHelp} onHide={() => setShowRelativeNormalizationHelp(false)} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Relativ normalisering for aviser</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p>
-                        For aviskorpuset kan relativ frekvens også beregnes med funksjonsord-baseline.
-                    </p>
-                    <p>
-                        Metoden bruker ordene <code>og</code>, <code>på</code>, <code>av</code>, <code>det</code>, <code>der</code>, <code>har</code>, <code>er</code>, <code>med</code>, <code>paa</code> og <code>af</code> som et estimat på korpusstørrelsen per år, og skalerer derfra til en estimert relativ frekvens.
-                    </p>
-                    <p className="mb-0">
-                        Dette kan gi mer stabile tall i perioder der OCR- og PDF-støy gjør vanlig relativfrekvens mindre pålitelig, særlig etter 2015. Verdiene er et estimat, ikke et eksakt mål på total ordmengde.
-                    </p>
                 </Modal.Body>
             </Modal>
         </div>
