@@ -17,6 +17,7 @@ function App() {
         lineThickness: 3,
         scaling: 'auto',
         curvePattern: false,
+        curvePatternColorMode: 'black',
         zoomStart: MIN_YEAR,
         zoomEnd: MAX_YEAR
     });
@@ -38,6 +39,7 @@ function App() {
             smooth: String(settings?.smoothing ?? 3),
             scale: String(settings?.scaling ?? 'auto'),
             pattern: settings?.curvePattern ? '1' : '0',
+            patternColor: String(settings?.curvePatternColorMode ?? 'black'),
             from: String(settings?.zoomStart ?? MIN_YEAR),
             to: String(settings?.zoomEnd ?? MAX_YEAR)
         });

@@ -40,6 +40,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
     const [lineThickness, setLineThickness] = useState(3);
     const [lineTransparency, setLineTransparency] = useState(0.1);
     const [curvePattern, setCurvePattern] = useState(Boolean(legacyState.curvePattern));
+    const [curvePatternColorMode, setCurvePatternColorMode] = useState(legacyState.curvePatternColorMode || 'black');
     const [palette, setPalette] = useState('standard');
     const palettes = [
         { id: 'standard', label: 'Standard' },
@@ -67,13 +68,14 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
             lineThickness,
             lineTransparency,
             curvePattern,
+            curvePatternColorMode,
             scaling,
             palette,
             zoomStart,
             zoomEnd,
             ...overrides
         });
-    }, [onSettingsChange, capitalization, smoothing, lineThickness, lineTransparency, curvePattern, scaling, palette, zoomStart, zoomEnd]);
+    }, [onSettingsChange, capitalization, smoothing, lineThickness, lineTransparency, curvePattern, curvePatternColorMode, scaling, palette, zoomStart, zoomEnd]);
     const updateCapitalization = (newValue) => {
         setCapitalization(newValue);
         emitSettings({ capitalization: newValue });
@@ -173,6 +175,7 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
             lineThickness,
             lineTransparency,
             curvePattern,
+            curvePatternColorMode,
             scaling,
             palette,
             zoomStart: hydratedZoomRange.start,
@@ -484,6 +487,35 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                         }}
                                     />
                                 </div>
+                                {curvePattern && (
+                                    <div className="settings-option-card">
+                                        <Form.Label className="mb-2 d-block">Mønsterfarger</Form.Label>
+                                        <div>
+                                            <Form.Check
+                                                type="radio"
+                                                id="curve-pattern-color-palette"
+                                                name="curve-pattern-color-mode"
+                                                label="Behold fargepalett"
+                                                checked={curvePatternColorMode === 'palette'}
+                                                onChange={() => {
+                                                    setCurvePatternColorMode('palette');
+                                                    emitSettings({ curvePatternColorMode: 'palette' });
+                                                }}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                id="curve-pattern-color-black"
+                                                name="curve-pattern-color-mode"
+                                                label="Svarte linjer"
+                                                checked={curvePatternColorMode === 'black'}
+                                                onChange={() => {
+                                                    setCurvePatternColorMode('black');
+                                                    emitSettings({ curvePatternColorMode: 'black' });
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="settings-option-card">
                                     <Form.Label>Transparens: {Math.round(lineTransparency * 100)}%</Form.Label>

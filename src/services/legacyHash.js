@@ -7,6 +7,7 @@ const DEFAULT_STATE = {
     smoothing: 3,
     scaling: 'auto',
     curvePattern: false,
+    curvePatternColorMode: 'black',
     zoomStart: null,
     zoomEnd: null
 };
@@ -62,6 +63,7 @@ export const parseLegacyHash = (hashValue) => {
         const smoothing = Number.parseInt(params.get('smooth') || '', 10);
         const scaling = params.get('scale') || DEFAULT_STATE.scaling;
         const curvePattern = params.get('pattern') === '1';
+        const curvePatternColorMode = params.get('patternColor') || DEFAULT_STATE.curvePatternColorMode;
         const zoomStart = Number.parseInt(params.get('from') || '', 10);
         const zoomEnd = Number.parseInt(params.get('to') || '', 10);
 
@@ -74,6 +76,7 @@ export const parseLegacyHash = (hashValue) => {
             smoothing: Number.isFinite(smoothing) ? smoothing : DEFAULT_STATE.smoothing,
             scaling,
             curvePattern,
+            curvePatternColorMode,
             zoomStart: Number.isFinite(zoomStart) ? zoomStart : DEFAULT_STATE.zoomStart,
             zoomEnd: Number.isFinite(zoomEnd) ? zoomEnd : DEFAULT_STATE.zoomEnd
         };
@@ -122,6 +125,7 @@ export const parseLegacyHash = (hashValue) => {
         smoothing: Number.isFinite(smoothing) ? smoothing : DEFAULT_STATE.smoothing,
         scaling: DEFAULT_STATE.scaling,
         curvePattern: DEFAULT_STATE.curvePattern,
+        curvePatternColorMode: DEFAULT_STATE.curvePatternColorMode,
         zoomStart,
         zoomEnd
     };

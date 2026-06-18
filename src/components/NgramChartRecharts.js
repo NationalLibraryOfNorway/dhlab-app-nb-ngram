@@ -101,6 +101,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
         return sanitizeRange(fallbackStart, fallbackEnd, MIN_YEAR, MAX_YEAR);
     }, [settings.zoomStart, settings.zoomEnd]);
     const palette = settings.palette || 'standard';
+    const curvePatternColorMode = settings.curvePatternColorMode || 'black';
     const colors = useMemo(() => colorPalettes[palette] || colorPalettes.standard, [palette]);
     const [isNarrow, setIsNarrow] = useState(false);
     // Add resize observer to detect container width
@@ -258,7 +259,9 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
         const labels = data.dates;
         const datasets = data.series.map((series, index) => {
             let values = [...series.data];
-            const baseColor = settings?.curvePattern ? '#000000' : colors[index % colors.length];
+            const paletteColor = colors[index % colors.length];
+            const useBlackPatternLines = settings?.curvePattern && curvePatternColorMode === 'black';
+            const baseColor = useBlackPatternLines ? '#000000' : paletteColor;
             const patternIndex = index % DASH_PATTERNS.length;
             const variantCycle = Math.floor(index / DASH_PATTERNS.length);
             const withMarker = settings?.curvePattern && variantCycle > 0;
@@ -520,7 +523,7 @@ const NgramChartRecharts = ({ data, graphType = 'relative', settings = {
                 chartInstance.current.destroy();
             }
         };
-    }, [data, graphType, settings.smoothing, settings.lineThickness, settings.lineTransparency, settings.curvePattern, isNarrow, settings.zoomStart, settings.zoomEnd, settings.scaling, colors, handleChartClick, homeRange]);
+    }, [data, graphType, settings.smoothing, settings.lineThickness, settings.lineTransparency, settings.curvePattern, curvePatternColorMode, isNarrow, settings.zoomStart, settings.zoomEnd, settings.scaling, colors, handleChartClick, homeRange]);
 
     return (
         <div className="d-flex flex-column flex-lg-row gap-3">
