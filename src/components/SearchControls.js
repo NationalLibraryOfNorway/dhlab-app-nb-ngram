@@ -34,7 +34,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
     const [showLangDropdown, setShowLangDropdown] = useState(false);
     const [showCorpusDropdown, setShowCorpusDropdown] = useState(false);
     const [showGraphTypeDropdown, setShowGraphTypeDropdown] = useState(false);
-    const [showRelativeModePopup, setShowRelativeModePopup] = useState(false);
     const [showToolsModal, setShowToolsModal] = useState(false);
     const [capitalization, setCapitalization] = useState(Boolean(legacyState.capitalization));
     const [smoothing, setSmoothing] = useState(legacyState.smoothing ?? 4);
@@ -117,7 +116,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                 setShowLangDropdown(false);
                 setShowCorpusDropdown(false);
                 setShowGraphTypeDropdown(false);
-                setShowRelativeModePopup(false);
             }
         };
 
@@ -126,7 +124,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                 setShowLangDropdown(false);
                 setShowCorpusDropdown(false);
                 setShowGraphTypeDropdown(false);
-                setShowRelativeModePopup(false);
             }
         };
 
@@ -140,19 +137,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
             document.removeEventListener('keydown', handleEscape);
         };
     }, [showLangDropdown, showCorpusDropdown, showGraphTypeDropdown]);
-
-    useEffect(() => {
-        if (!showGraphTypeDropdown) {
-            setShowRelativeModePopup(false);
-            return;
-        }
-
-        if (graphType === 'relative') {
-            setShowRelativeModePopup(true);
-        } else {
-            setShowRelativeModePopup(false);
-        }
-    }, [showGraphTypeDropdown, graphType]);
 
     const performSearch = () => {
         const wordList = words.split(',')
@@ -225,16 +209,11 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
         performSearch();
     };
 
-    const handleGraphTypeSelect = (type, closeDropdown = true) => {
+    const handleGraphTypeSelect = (type) => {
         setGraphType(type);
         onGraphTypeChange(type);
         setShowModal(false);
-        if (type !== 'relative') {
-            setShowRelativeModePopup(false);
-        }
-        if (closeDropdown) {
-            setShowGraphTypeDropdown(false);
-        }
+        setShowGraphTypeDropdown(false);
     };
 
     const graphTypes = [
@@ -296,7 +275,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                 setShowLangDropdown((prev) => !prev);
                                 setShowCorpusDropdown(false);
                                 setShowGraphTypeDropdown(false);
-                                setShowRelativeModePopup(false);
                             }}
                             style={{ 
                                 border: 'none',
@@ -339,7 +317,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                     setShowCorpusDropdown((prev) => !prev);
                                     setShowLangDropdown(false);
                                     setShowGraphTypeDropdown(false);
-                                    setShowRelativeModePopup(false);
                                 }}
                                 style={{ 
                                     border: 'none'
@@ -380,7 +357,6 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                 setShowGraphTypeDropdown((prev) => !prev);
                                 setShowLangDropdown(false);
                                 setShowCorpusDropdown(false);
-                                setShowRelativeModePopup(graphType === 'relative');
                             }}
                             style={{ 
                                 border: 'none',
@@ -402,60 +378,18 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                                 top: '100%',
                                 left: 0,
                                 marginTop: '0.125rem',
-                                minWidth: '180px'
+                                minWidth: '120px'
                             }}>
-                                <div style={{ position: 'relative' }}>
-                                    <button
-                                        className={`dropdown-item d-flex align-items-center justify-content-between${graphType === 'relative' ? ' active' : ''}`}
-                                        onMouseEnter={() => setShowRelativeModePopup(true)}
-                                        onFocus={() => setShowRelativeModePopup(true)}
-                                        onClick={() => {
-                                            handleGraphTypeSelect('relative', false);
-                                            setShowRelativeModePopup(true);
-                                        }}
-                                    >
-                                        <span>relativ</span>
-                                        <span aria-hidden="true" style={{ opacity: 0.7 }}>{showRelativeModePopup ? '▾' : '▸'}</span>
-                                    </button>
-                                    {showRelativeModePopup && (
-                                        <div className="d-flex flex-column">
-                                            <button
-                                                className={`dropdown-item ps-4${relativeNormalization === 'standard' ? ' active' : ''}`}
-                                                onClick={() => {
-                                                    handleGraphTypeSelect('relative', false);
-                                                    setRelativeNormalization('standard');
-                                                    emitSettings({ relativeNormalization: 'standard' });
-                                                    setShowRelativeModePopup(false);
-                                                    setShowGraphTypeDropdown(false);
-                                                }}
-                                            >
-                                                ordmengde
-                                            </button>
-                                            <button
-                                                className={`dropdown-item ps-4${relativeNormalization === 'functionWords' ? ' active' : ''}`}
-                                                onClick={() => {
-                                                    handleGraphTypeSelect('relative', false);
-                                                    setRelativeNormalization('functionWords');
-                                                    emitSettings({ relativeNormalization: 'functionWords' });
-                                                    setShowRelativeModePopup(false);
-                                                    setShowGraphTypeDropdown(false);
-                                                }}
-                                            >
-                                                funksjonsord+
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
                                 <button className="dropdown-item" onClick={() => {
-                                    setShowRelativeModePopup(false);
+                                    handleGraphTypeSelect('relative');
+                                }}>relativ</button>
+                                <button className="dropdown-item" onClick={() => {
                                     handleGraphTypeSelect('absolute');
                                 }}>absolutt</button>
                                 <button className="dropdown-item" onClick={() => {
-                                    setShowRelativeModePopup(false);
                                     handleGraphTypeSelect('cumulative');
                                 }}>kumulativ</button>
                                 <button className="dropdown-item" onClick={() => {
-                                    setShowRelativeModePopup(false);
                                     handleGraphTypeSelect('cohort');
                                 }}>kohort</button>
                             </div>
@@ -618,6 +552,25 @@ const SearchControls = ({ onSearch, onGraphTypeChange, data, settings, onSetting
                         <div>
                             <strong className="help-section-title">Akse og skala</strong>
                             <div style={{ paddingLeft: '1em' }}>
+                                {graphType === 'relative' && (
+                                    <div className="settings-option-card">
+                                        <Form.Label>Relativt til</Form.Label>
+                                        <Form.Select
+                                            value={relativeNormalization}
+                                            onChange={e => {
+                                                const value = e.target.value;
+                                                setRelativeNormalization(value);
+                                                emitSettings({ relativeNormalization: value });
+                                            }}
+                                        >
+                                            <option value="standard">Total ordmengde (standard)</option>
+                                            <option value="functionWords">Funksjonsord-baseline (estimert)</option>
+                                        </Form.Select>
+                                        <div className="text-muted help-muted" style={{ fontSize: '0.9em', marginTop: '0.4rem' }}>
+                                            Funksjonsord-baseline er et estimat og kan være særlig nyttig i perioder med OCR-støy.
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="settings-option-card">
                                     <Form.Label>Skalering av y-aksen</Form.Label>
                                     <Form.Select
